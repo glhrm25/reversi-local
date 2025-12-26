@@ -1,0 +1,32 @@
+@startuml
+'https://plantuml.com/component-diagram
+
+skinparam componentStyle rectangle
+
+package model {
+  [Clash.kt] ..> [Game.kt]
+  [Clash.kt] ..> [Player.kt]
+  [Clash.kt] ..> [Name.kt]
+  [Player.kt] ..> [Color.kt]
+  [Game.kt] ..> [Position.kt]
+  [Game.kt] ..> [Color.kt]
+  [Game.kt] ..> [Moves.kt]
+  [GameSerializer] ..> [Game.kt]
+}
+
+package console {
+  [Main.kt] ..> [Command.kt]
+  [Main.kt] ...> [Input.kt]
+  [Main.kt] ..> [Output.kt]
+  [Command.kt] ..> [Output.kt]
+}
+
+package storage {
+    [TextFileStorage.kt] ..> [Storage.kt]
+}
+
+[Clash.kt] --> [TextFileStorage.kt]
+[Command.kt] --> [Clash.kt]
+[Main.kt] --> [Clash.kt]
+
+@enduml

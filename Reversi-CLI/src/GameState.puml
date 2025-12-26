@@ -1,0 +1,24 @@
+@startuml
+'https://plantuml.com/state-diagram
+
+state Run : turn : Player
+state RunPassed : tr : Player
+state Play <<choice>>
+state Pass <<choice>>
+state Win : winner : Player
+state Draw
+
+[*] -> Run : new
+Run --> Play : play
+Run -> RunPassed : pass
+RunPassed -> Play: play
+RunPassed -down-> Pass: pass
+Pass --> Win : [winner]
+Pass --> Draw : [draw]
+Play -left-> Win : [winner]
+Play -> Draw : [draw]
+Play -up-> Run : [else]
+Win -up-> Run: new
+Draw -up-> Run: new
+
+@enduml
