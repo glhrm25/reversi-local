@@ -19,6 +19,7 @@ import reversi.model.*
 
 
 val STATUS_HEIGHT = 40.dp
+val STATUS_WIDTH = GRID_SIDE + WIDTH + LINE_THICKNESS
 
 @Composable
 @Preview
@@ -27,29 +28,30 @@ fun StatusBarTest() {
 }
 
 @Composable
-fun StatusBar(state: GameState, you: PlayerColor, isMp: Boolean, amountBlackPieces: Int, amountWhitePieces: Int) = Row(
-    Modifier
-        .height(STATUS_HEIGHT)
-        .background(Color.LightGray)
-        .width(GRID_SIDE),
-    verticalAlignment = Alignment.CenterVertically,
-    horizontalArrangement = Arrangement.Center
-) {
-    if (isMp) {
-        LabeledCell("You:", you)
+fun StatusBar(state: GameState, you: PlayerColor, isMp: Boolean, amountBlackPieces: Int, amountWhitePieces: Int) =
+    Row(
+        Modifier
+            .height(STATUS_HEIGHT)
+            .background(Color.LightGray)
+            .width(STATUS_WIDTH),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        if (isMp) {
+            LabeledCell("You:", you)
+            Spacer(Modifier.width(STATUS_HEIGHT * 3))
+        }
+        val (txt, player) = when (state) {
+            is Run -> "Turn:" to state.turn
+            is Win -> "Winner:" to state.winner
+            is Draw -> "Draw" to null
+        }
+        LabeledCell(txt, player)
         Spacer(Modifier.width(STATUS_HEIGHT * 3))
+        LabeledCell("$amountBlackPieces x", PlayerColor.BLACK)
+        Spacer(Modifier.width(STATUS_HEIGHT / 5))
+        LabeledCell("$amountWhitePieces x", PlayerColor.WHITE)
     }
-    val (txt, player) = when (state) {
-        is Run -> "Turn:" to state.turn
-        is Win -> "Winner:" to state.winner
-        is Draw -> "Draw" to null
-    }
-    LabeledCell(txt, player)
-    Spacer(Modifier.width(STATUS_HEIGHT * 3))
-    LabeledCell("$amountBlackPieces x", PlayerColor.BLACK)
-    Spacer(Modifier.width(STATUS_HEIGHT / 5))
-    LabeledCell("$amountWhitePieces x", PlayerColor.WHITE)
-}
 
 
 @Composable

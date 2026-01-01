@@ -9,18 +9,32 @@ import androidx.compose.ui.window.*
 import androidx.compose.ui.unit.dp
 import reversi_kmp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
-import reversi.model.BOARD_SIZE
 
+/**
+ * TO-DO:
+ * - CHANGE LISTS TO SETS
+ * - REPETITIVE CODE:
+ *      - FIX TARGETS FUNCTION REPETITIVE CODE
+ *      - FIX REFRESH <-> AUTO-REFRESH FUNCTION REPETITIVE CODE
+ * - BUGS:
+ *      - FIX BUG OF PLAYING WHEN GAME WAS DELETED BY THE OWNER
+ *      - FIX BUG ON SHOWTARGETS (VALID MOVES)
+ *      - FIX BUG ON PIECE COUNTING (STATUS BAR)
+ */
 @Composable
-fun FrameWindowScope.App(onExit: ()->Unit) {
+fun FrameWindowScope.App(onExit: MutableState<()->Unit>) {
     val scope = rememberCoroutineScope()
-    val vm = remember { AppViewModel(scope) }
+    val vm = remember { AppViewModel(scope).also{
+        val oldOnExit = onExit.value
+        onExit.value = { it.finish(); oldOnExit() }
+    } }
+
     MenuBar {
         Menu("Game") {
             Item("New", onClick = vm::new)
             Item("Join", onClick = vm::join)
             Item("Refresh", onClick = vm::refresh, enabled = vm.isMP && !vm.isYourTurn)
-            Item("Exit", onClick = { vm.finish() ; onExit() })
+            Item("Exit", onClick = { onExit.value() })
         }
         Menu("Play") {
             Item("Pass", onClick = vm::pass, enabled = vm.isRun)
@@ -30,10 +44,10 @@ fun FrameWindowScope.App(onExit: ()->Unit) {
             CheckboxItem("Auto-Refresh", checked = vm.autoRefreshOption, enabled = vm.isMP, onCheckedChange = vm::setAutoRefreshSetting)
         }
     }
+
     MaterialTheme {
         if (vm.isRun) Column {
-            //Grid(vm.game.board, validMoves = vm.validMoves, targetsAssistance = vm.you.toggleTargets, onClick = vm::play)
-            labeledGrid(vm.game.board, validMoves = vm.validMoves, targetsAssistance = vm.you.toggleTargets, onClick = vm::play)
+            labeledGrid(vm.game, vm.animations, targetsAssistance = vm.you.toggleTargets, onClick = vm::play)
             StatusBar(vm.game.state, vm.you.playerColor, vm.isMP, vm.blackPiecesCounter, vm.whitePiecesCounter)
         }
         else
@@ -44,18 +58,20 @@ fun FrameWindowScope.App(onExit: ()->Unit) {
     }
 }
 
-//val TOTAL_WIDTH = 544.dp
-val TOTAL_WIDTH = WIDTH + LINE_THICKNESS + GRID_SIDE
+val TOTAL_WIDTH = 544.dp
+//val TOTAL_WIDTH = STATUS_WIDTH
 val TOTAL_HEIGHT = 630.dp
+//val TOTAL_HEIGHT = WIDTH + LINE_THICKNESS * 2 + GRID_SIDE + STATUS_HEIGHT
 
 fun main() = application {
+    val onExit = remember { mutableStateOf<()->Unit>(::exitApplication) }
     Window(
-        onCloseRequest = {}, //::exitApplication
+        onCloseRequest = { onExit.value() },
         title = "ReversiKMP",
         icon = painterResource(Res.drawable.cross),
         state = WindowState(size= DpSize(TOTAL_WIDTH,TOTAL_HEIGHT)),
         resizable = false,
     ) {
-        App(::exitApplication)
+        App(onExit)
     }
 }

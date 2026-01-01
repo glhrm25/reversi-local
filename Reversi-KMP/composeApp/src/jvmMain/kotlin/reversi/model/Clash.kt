@@ -38,7 +38,7 @@ open class Clash (val gs: GameStorage) {
     open fun finish(){ }
 }
 
-open class ClashRun(gs: GameStorage, open val game: Game, open val side: Player): Clash(gs){
+abstract class ClashRun(gs: GameStorage, open val game: Game, open val side: Player): Clash(gs){ // Can't be invocated but can be derivative
     override fun finish() { deleteIfOwner() }
 }
 

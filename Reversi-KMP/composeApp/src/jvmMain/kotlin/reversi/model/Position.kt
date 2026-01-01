@@ -15,6 +15,8 @@ class Position private constructor(val index: Int) {
         // Invoke -> Position()
         operator fun invoke(idx: Int): Position = values[idx]
     }
+
+    override fun toString() = "$row:$column"
 }
 
 fun toBoardIndex(row: Int, column: Char): Int = (row-1) * BOARD_SIZE + column.toIntColumn()

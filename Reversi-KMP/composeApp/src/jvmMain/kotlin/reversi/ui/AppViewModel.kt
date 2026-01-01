@@ -28,6 +28,7 @@ class AppViewModel(val scope: CoroutineScope) {
 
     fun play(pos: Position) {
         if (game.state is Run && !isWaiting){
+            animations = game.turnMoves((game.state as Run).turn, pos).map{ (p, _) -> p}.toSet()
             oper { play(pos) }
             waitForOther()
         }
@@ -49,7 +50,10 @@ class AppViewModel(val scope: CoroutineScope) {
             } else throw ex
         }
     }
-    fun setAutoRefreshSetting(value: Boolean) { autoRefreshOption = value }
+    fun setAutoRefreshSetting(value: Boolean) {
+        autoRefreshOption = value
+        waitForOther()
+    }
 
     val currentTargetsAssistanceOption get() = if (isRun) you.toggleTargets else false
     fun setTargetsAssistanceSetting(value: Boolean) = oper { targets(value) }
@@ -85,7 +89,9 @@ class AppViewModel(val scope: CoroutineScope) {
     val you get() = (clash as ClashRun).side
     val name get() = (clash as ClashRunMP).name
     val newAvailable get() = (clash as? ClashRun)?.newAvailable() ?: false
-    val validMoves get() = if (game.state is Run) game.validMoves((game.state as Run).turn) else emptyList()
+
+    var animations by mutableStateOf<Set<Position>>(emptySet())
+
     val whitePiecesCounter get () = game.board.count { (_, col) -> col == PlayerColor.WHITE }
     val blackPiecesCounter get () = game.board.count { (_, col) -> col == PlayerColor.WHITE }
 

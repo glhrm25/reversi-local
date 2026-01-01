@@ -15,16 +15,17 @@ import reversi.model.Position
 @Composable
 @Preview
 fun GridTest() {
-    Grid(generateBoard(), onClick = { } )
+    //Grid(generateBoard(), onClick = { } )
 }
 
 val LINE_THICKNESS = 4.dp
 val WIDTH = 16.dp
 val GRID_SIDE = CELL_SIDE * BOARD_SIZE + LINE_THICKNESS * (BOARD_SIZE - 1)
+
 @Composable
 fun Grid(
-    board: Board,
-    validMoves: List<Position> = emptyList(),
+    game: Game,
+    animations: Set<Position>,
     targetsAssistance: Boolean = false,
     modifier: Modifier = Modifier,
     onClick: (Position)->Unit
@@ -33,14 +34,18 @@ fun Grid(
         modifier.height(GRID_SIDE).background(Color.Black),
         verticalArrangement = Arrangement.spacedBy(LINE_THICKNESS)
     ) {
+        val validMoves = game.validMoves((game.state as Run).turn)
         repeat(BOARD_SIZE) { row ->
             Row(
-                modifier.width(GRID_SIDE),
+                modifier.width(GRID_SIDE).background(Color.Black),
                 horizontalArrangement = Arrangement.spacedBy(LINE_THICKNESS)
             ) {
                 repeat(BOARD_SIZE) { col ->
                     val pos = Position(row*BOARD_SIZE+col)
-                    Cell(board[pos], showValidMoves = pos in validMoves && targetsAssistance) { onClick(pos) }
+                    Cell(game.board[pos],
+                        showValidMoves = pos in validMoves && targetsAssistance,
+                        animation = pos in animations
+                    ) { onClick(pos) }
                 }
             }
         }
@@ -49,8 +54,8 @@ fun Grid(
 
 @Composable
 fun labeledGrid(
-    board: Board,
-    validMoves: List<Position> = emptyList(),
+    game: Game,
+    animations: Set<Position>,
     targetsAssistance: Boolean = false,
     modifier: Modifier = Modifier.background(Color.DarkGray),
     onClick: (Position)->Unit
@@ -60,13 +65,14 @@ fun labeledGrid(
             modifier = Modifier
                 .height(WIDTH)
                 .width(WIDTH + LINE_THICKNESS + GRID_SIDE),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Spacer(Modifier.width(WIDTH + LINE_THICKNESS))
 
             Row(
                 modifier = Modifier.width(GRID_SIDE),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(LINE_THICKNESS)
             ) {
                 repeat(BOARD_SIZE) { i ->
                     Box(
@@ -101,7 +107,7 @@ fun labeledGrid(
             }
 
             Spacer(Modifier.width(LINE_THICKNESS))
-            Grid(board, validMoves, targetsAssistance, modifier, onClick)
+            Grid(game, animations,targetsAssistance, modifier, onClick)
         }
     }
 }

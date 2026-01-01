@@ -3,6 +3,8 @@ package reversi.ui
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,18 +21,21 @@ fun EditDialog(mode: EditMode, onCancel: ()->Unit, onAction: (String, PlayerColo
     var isMultiplayer by mutableStateOf(true)
     AlertDialog(
         onDismissRequest = onCancel,
-        title = { Text("Name for ${mode.text}") },
+        title = { Text("Name to ${mode.text}") },
         text = {
             Column(modifier = Modifier.padding(15.dp)) {
                 if (mode == EditMode.START) {
                     // Select game's state (multiplayer / singleplayer)
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        RadioButton(selected = isMultiplayer, onClick = { isMultiplayer = !isMultiplayer })
-                        Text("Multiplayer")
+                        Switch(checked = isMultiplayer, onCheckedChange = { isMultiplayer = !isMultiplayer })
+                        Spacer(Modifier.width(10.dp))
+                        Text("Multiplayer", style = MaterialTheme.typography.bodyLarge)
                     }
                     // Select user's pieces
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        RadioButton(selected = side == PlayerColor.BLACK, onClick = { side = side.otherColor })
+                        Switch(checked = side == PlayerColor.BLACK, onCheckedChange = { side = side.otherColor })
+                        //RadioButton(selected = side == PlayerColor.BLACK, onClick = { side = side.otherColor })
+                        Spacer(Modifier.width(10.dp))
                         Text("Black Pieces")
                     }
                 }
@@ -39,7 +44,9 @@ fun EditDialog(mode: EditMode, onCancel: ()->Unit, onAction: (String, PlayerColo
                     OutlinedTextField(
                         value = name,
                         label = { Text("clash name") },
-                        onValueChange = { if (Name.isValid(it)) name = it }
+                        onValueChange = { name = it },
+                        placeholder = { Text("Enter a name") },
+                        isError = !Name.isValid(name)
                     )
                 }
             }
