@@ -33,23 +33,11 @@ class AppViewModel(val scope: CoroutineScope) {
             waitForOther()
         }
     }
-    fun pass(){ oper { pass() } }
+    fun pass() = oper { pass() }
 
     var autoRefreshOption by mutableStateOf(false)
         private set
-    fun refresh() {
-        //oper { refresh() }
-        try {
-            clash = clash.refresh()
-        } catch (ex: Exception) {
-            if (ex is IllegalStateException) {
-                message = ex.message
-                if (ex is GameNotFoundException) {
-                    clash = Clash(storage)
-                }
-            } else throw ex
-        }
-    }
+    fun refresh() = oper { refresh() }
     fun setAutoRefreshSetting(value: Boolean) {
         autoRefreshOption = value
         waitForOther()
@@ -102,8 +90,12 @@ class AppViewModel(val scope: CoroutineScope) {
         try {
             clash = clash.op()
         } catch (ex: Exception) {
-            if (ex is IllegalStateException || ex is IllegalArgumentException)
+            println(ex)
+            if (ex is IllegalStateException || ex is IllegalArgumentException) {
                 message = ex.message
+                if (ex is GameNotFoundException)
+                    clash = Clash(storage)
+            }
             else throw ex
         }
     }

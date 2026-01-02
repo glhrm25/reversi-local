@@ -1,10 +1,12 @@
 package reversi.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -33,10 +35,9 @@ fun EditDialog(mode: EditMode, onCancel: ()->Unit, onAction: (String, PlayerColo
                     }
                     // Select user's pieces
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Switch(checked = side == PlayerColor.BLACK, onCheckedChange = { side = side.otherColor })
-                        //RadioButton(selected = side == PlayerColor.BLACK, onClick = { side = side.otherColor })
+                        Text("Player: ", style = MaterialTheme.typography.bodyLarge)
                         Spacer(Modifier.width(10.dp))
-                        Text("Black Pieces")
+                        animatedPiece(side, modifier = Modifier.size(CELL_SIDE/2).clickable{ side = side.otherColor })
                     }
                 }
                 // Fill game's name
