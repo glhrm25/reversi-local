@@ -6,16 +6,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.window.*
-import androidx.compose.ui.unit.dp
 import reversi_kmp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
 
-/**
- * TO-DO:
- * - CHANGE LISTS TO SETS
- * - FUNCTION IN MOVES.KT COULD BE EXTENSIONS OF BOARD INSTEAD OF GAME
- *      - ALSO, MOVE THEM TO ANOTHER FILE AND DELETE MOVES.KT
- */
 @Composable
 fun FrameWindowScope.App(onExit: MutableState<()->Unit>) {
     val scope = rememberCoroutineScope()
@@ -35,8 +28,8 @@ fun FrameWindowScope.App(onExit: MutableState<()->Unit>) {
             Item("Pass", onClick = vm::pass, enabled = vm.isRun)
         }
         Menu("Options") {
-            CheckboxItem("Show Targets", checked = vm.currentTargetsAssistanceOption, enabled = vm.isRun, onCheckedChange = vm::setTargetsAssistanceSetting)
-            CheckboxItem("Auto-Refresh", checked = vm.autoRefreshOption, enabled = vm.isMP, onCheckedChange = vm::setAutoRefreshSetting)
+            CheckboxItem("Show Targets", checked = vm.targetsAssistanceSetting, enabled = vm.isRun, onCheckedChange = vm::targets)
+            CheckboxItem("Auto-Refresh", checked = vm.autoRefreshSetting, enabled = vm.isMP, onCheckedChange = vm::changeAutoRefreshSetting)
         }
     }
 
@@ -53,10 +46,8 @@ fun FrameWindowScope.App(onExit: MutableState<()->Unit>) {
     }
 }
 
-val TOTAL_WIDTH = 544.dp
-//val TOTAL_WIDTH = STATUS_WIDTH
-val TOTAL_HEIGHT = 630.dp
-//val TOTAL_HEIGHT = WIDTH + LINE_THICKNESS * 2 + GRID_SIDE + STATUS_HEIGHT
+val TOTAL_WIDTH = STATUS_WIDTH
+val TOTAL_HEIGHT = (WIDTH + LINE_THICKNESS + STATUS_HEIGHT)*2 + GRID_SIDE
 
 fun main() = application {
     val onExit = remember { mutableStateOf<()->Unit>(::exitApplication) }

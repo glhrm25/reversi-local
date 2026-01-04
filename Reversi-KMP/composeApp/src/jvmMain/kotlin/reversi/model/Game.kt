@@ -70,7 +70,7 @@ fun Game.play(move: Position): Game {
     check(this.state is Run) {"Game has ended."}
     require(move in validMoves(state.turn)){"Invalid move."}
 
-    val newBoard = board + (move to state.turn) + turnMoves(state.turn, move)
+    val newBoard = board + (move to state.turn) + turningPieces(state.turn, move)
     return this.copy(
         board = newBoard,
         state = updateState(newBoard, state),
@@ -129,9 +129,9 @@ fun initialBoard(): Board {
     val middleColumn = BOARD_SIZE / 2
 
    return mapOf(
-           Position(toBoardIndex(middleColumn, COLUMNS[middleColumn])) to BLACK,
-           Position(toBoardIndex(middleColumn + 1, COLUMNS[middleColumn - 1])) to BLACK,
-           Position(toBoardIndex(middleColumn + 1, COLUMNS[middleColumn])) to WHITE,
-           Position(toBoardIndex(middleColumn, COLUMNS[middleColumn - 1])) to WHITE,
+           Position(middleColumn, COLUMNS[middleColumn]) to BLACK,
+           Position(middleColumn + 1, COLUMNS[middleColumn - 1]) to BLACK,
+           Position(middleColumn + 1, COLUMNS[middleColumn]) to WHITE,
+           Position(middleColumn, COLUMNS[middleColumn - 1]) to WHITE,
    )
 }

@@ -28,24 +28,25 @@ class AppViewModel(val scope: CoroutineScope) {
 
     fun play(pos: Position) {
         if (game.state is Run && !isWaiting){
-            animations = game.turnMoves((game.state as Run).turn, pos).map{ (p, _) -> p}.toSet()
+            animations = game.turningPieces((game.state as Run).turn, pos).map{ (p, _) -> p}.toSet()
             oper { play(pos) }
             waitForOther()
         }
     }
     fun pass() = oper { pass() }
 
-    var autoRefreshOption by mutableStateOf(false)
-        private set
     fun refresh() = oper { refresh() }
-    fun setAutoRefreshSetting(value: Boolean) {
-        autoRefreshOption = value
+    fun changeAutoRefreshSetting(value: Boolean) {
+        autoRefreshSetting = value
         waitForOther()
     }
 
-    val currentTargetsAssistanceOption get() = if (isRun) you.toggleTargets else false
-    fun setTargetsAssistanceSetting(value: Boolean) = oper { targets(value) }
+    val targetsAssistanceSetting get() = if (isRun) you.toggleTargets else false
+    fun targets(value: Boolean) = oper { targets(value) }
 
+    /**
+     * Starts a new game or joins an existing one, based on the users input.
+     */
     fun doAction(name: String, side: PlayerColor, isMultiplayer: Boolean) {
         cancelWaiting()
         val nm = if(!isMultiplayer) null else Name(name)
@@ -56,6 +57,7 @@ class AppViewModel(val scope: CoroutineScope) {
         editMode = null
         waitForOther()
     }
+
     /**
      * Indicates if the edit dialog is being shown
      */
@@ -78,6 +80,9 @@ class AppViewModel(val scope: CoroutineScope) {
     val name get() = (clash as ClashRunMP).name
     val newAvailable get() = (clash as? ClashRun)?.newAvailable() ?: false
 
+    /**
+    * Set that contains the flipping pieces after a move to display the animation
+    */
     var animations by mutableStateOf<Set<Position>>(emptySet())
 
     val whitePiecesCounter get () = game.board.count { (_, col) -> col == PlayerColor.WHITE }
@@ -110,6 +115,8 @@ class AppViewModel(val scope: CoroutineScope) {
     /**
      * Auto-refresh job
      */
+    var autoRefreshSetting by mutableStateOf(false)
+        private set
     private var job by mutableStateOf<Job?>(null)
     val isWaiting get() = job != null
 
@@ -118,7 +125,7 @@ class AppViewModel(val scope: CoroutineScope) {
         job = null
     }
     private fun waitForOther() {
-        if (clash !is ClashRun || newAvailable || !autoRefreshOption) return
+        if (clash !is ClashRun || newAvailable || !autoRefreshSetting) return
         job = scope.launch {
             do {
                 delay(3000)
@@ -133,7 +140,7 @@ class AppViewModel(val scope: CoroutineScope) {
                         }
                     } else throw ex
                 }
-            } while (!newAvailable && autoRefreshOption)
+            } while (!newAvailable && autoRefreshSetting)
             job = null
         }
     }

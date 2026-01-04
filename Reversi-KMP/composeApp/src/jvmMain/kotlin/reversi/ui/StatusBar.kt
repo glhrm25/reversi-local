@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -19,7 +20,7 @@ import reversi.model.*
 
 
 val STATUS_HEIGHT = 40.dp
-val STATUS_WIDTH = GRID_SIDE + WIDTH + LINE_THICKNESS
+val STATUS_WIDTH = GRID_SIDE + WIDTH * 2 + LINE_THICKNESS
 
 @Composable
 @Preview
@@ -46,7 +47,8 @@ fun StatusBar(state: GameState, you: PlayerColor, isMp: Boolean, amountBlackPiec
             is Win -> "Winner:" to state.winner
             is Draw -> "Draw" to null
         }
-        LabeledCell(txt, player)
+        Text(txt, style = MaterialTheme.typography.bodyLarge)
+        if (player != null) animatedPiece(player, modifier = Modifier.background(Color.LightGray).size(CELL_SIDE / 2))
         Spacer(Modifier.width(STATUS_HEIGHT * 3))
         LabeledCell("$amountBlackPieces x", PlayerColor.BLACK)
         Spacer(Modifier.width(STATUS_HEIGHT / 5))

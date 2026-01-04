@@ -1,20 +1,22 @@
 package reversi.ui
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import reversi.model.Name
 import reversi.model.PlayerColor
 import reversi.model.opponent
+
+val SPACE_BETWEEN_ELEMENTS = 4.dp
 
 @Composable
 fun EditDialog(mode: EditMode, onCancel: ()->Unit, onAction: (String, PlayerColor, Boolean)->Unit) {
@@ -25,34 +27,39 @@ fun EditDialog(mode: EditMode, onCancel: ()->Unit, onAction: (String, PlayerColo
         onDismissRequest = onCancel,
         title = { Text("Name to ${mode.text}") },
         text = {
-            Column(modifier = Modifier.padding(15.dp)) {
+            Column(modifier = Modifier.padding(15.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(SPACE_BETWEEN_ELEMENTS)) {
                 if (mode == EditMode.START) {
                     // Select game's state (multiplayer / singleplayer)
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Switch(checked = isMultiplayer, onCheckedChange = { isMultiplayer = !isMultiplayer })
-                        Spacer(Modifier.width(10.dp))
-                        Text("Multiplayer", style = MaterialTheme.typography.bodyLarge)
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(SPACE_BETWEEN_ELEMENTS)) {
+                        Checkbox(
+                            checked = isMultiplayer,
+                            onCheckedChange = { isMultiplayer = it },
+                            colors = CheckboxDefaults.colors(
+                                checkedColor = Color.Cyan,
+                                uncheckedColor = Color.Gray
+                            )
+                        )
+                        Text("Multiplayer", style = MaterialTheme.typography.titleLarge)
                     }
                     // Select user's pieces
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("Player: ", style = MaterialTheme.typography.bodyLarge)
-                        Spacer(Modifier.width(10.dp))
-                        animatedPiece(side, modifier = Modifier.size(CELL_SIDE/2).clickable{ side = side.opponent })
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(SPACE_BETWEEN_ELEMENTS), modifier = Modifier.clickable{ side = side.opponent }) {
+                        Text("Player: ", style = MaterialTheme.typography.titleLarge)
+                        animatedPiece(side, modifier = Modifier.size(CELL_SIDE/2))
                     }
                 }
                 // Fill game's name
                 if (isMultiplayer) {
-                    OutlinedTextField(
+                    TextField(
                         value = name,
                         label = { Text("clash name") },
                         onValueChange = { name = it },
                         placeholder = { Text("Enter a name") },
-                        isError = !Name.isValid(name)
+                        singleLine = true
                     )
                 }
             }
         },
         dismissButton = { Button(onClick = onCancel) { Text("Cancel") } },
-        confirmButton = { Button(onClick = { onAction(name, side, isMultiplayer) }, enabled = !isMultiplayer || Name.isValid(name)) { Text(mode.text) } }
+        confirmButton = {  Button(onClick = { onAction(name, side, isMultiplayer) }, enabled = !isMultiplayer || Name.isValid(name)) { Text(mode.text) } }
     )
 }

@@ -18,7 +18,7 @@ fun GridTest() {
     //Grid(generateBoard(), onClick = { } )
 }
 
-val LINE_THICKNESS = 4.dp
+val LINE_THICKNESS = 3.dp
 val WIDTH = 16.dp
 val GRID_SIDE = CELL_SIDE * BOARD_SIZE + LINE_THICKNESS * (BOARD_SIZE - 1)
 

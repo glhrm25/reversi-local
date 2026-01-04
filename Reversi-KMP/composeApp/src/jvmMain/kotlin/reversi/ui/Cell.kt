@@ -23,6 +23,7 @@ import reversi.model.*
 
 val CELL_SIDE = 60.dp
 const val FLIP_FRAME_DELAY = 30
+val TARGETS_FRAME_PADDING = CELL_SIDE / 4
 val BlackToWhiteFrames = listOf(
     Res.drawable.Black,
     Res.drawable.BlackToWhite1,
@@ -55,7 +56,7 @@ fun Cell(
     onClickInEmpty: ()->Unit = { }
 ) {
     if (showValidMoves)
-        Box(modifier.padding(CELL_SIDE / 8).clickable(onClick = onClickInEmpty).background(Color.Yellow, CircleShape))
+        Box(modifier.padding(TARGETS_FRAME_PADDING).clickable(onClick = onClickInEmpty).background(Color.Yellow, CircleShape))
     else if (player == null)
         Box(modifier.clickable(onClick = onClickInEmpty))
     else {

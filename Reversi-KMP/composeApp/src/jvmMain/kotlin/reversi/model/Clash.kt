@@ -4,6 +4,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import storage.Storage
 
+const val READ_DELAY = 5000L
+
 typealias GameStorage = Storage<Name, Game>
 
 open class Clash (val gs: GameStorage) {
@@ -106,7 +108,7 @@ fun ClashRun.newAvailable() =
         else -> game.owner.opponent
     }
 
-fun Clash.deleteIfOwner() {
+fun ClashRun.deleteIfOwner() {
     if (this is ClashRunMP && side.playerColor == this.game.owner) gs.delete(name)
 }
 
@@ -114,7 +116,7 @@ class GameNotFoundException: IllegalStateException("Game not found")
 
 private suspend fun GameStorage.slowRead(name: Name): Game?{
     return withContext(Dispatchers.IO) { // Dispacthers.IO -> Arranja uma cortina noutra thread
-        Thread.sleep(5000)
+        Thread.sleep(READ_DELAY)
         read(name)
     }
 }
