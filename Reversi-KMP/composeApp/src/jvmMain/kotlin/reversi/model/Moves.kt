@@ -1,72 +1,55 @@
 package reversi.model
 
-private val directions = listOf(
-    1, -1,  // Horizontal
-    BOARD_SIZE, -BOARD_SIZE, // Vertical
-    BOARD_SIZE + 1, -BOARD_SIZE - 1, // backslash
-    BOARD_SIZE - 1, -BOARD_SIZE + 1, // slash
-)
-
-fun Game.validMoves(turn: PlayerColor): List<Position> {
-    val opponent = turn.otherColor
-
-    val l = board.entries.map { (c, p) ->
-        if (p == opponent){
-            directions.map{
-                val pd = c.index + it
-                if (pd in 0 until BOARD_CELLS &&
-                    board[Position(pd)] == null &&
-                    this.turnMoves(turn, Position(pd)).isNotEmpty()
-                    ) Position(pd)
-                else null
-            }
-        }
-        else emptyList()
-    }
-    return l.flatten().filterNotNull()
+enum class Direction(val difRow: Int, val difCol: Int) {
+    UP(-1,0), DOWN(1,0), LEFT(0,-1), RIGHT(0,1),
+    UP_LEFT(-1,-1), UP_RIGHT(-1,1), DOWN_LEFT(1,-1), DOWN_RIGHT(1,1)
 }
+
+fun cellsInDirection(from: Position, dir: Direction) = buildList {
+    var pos = from + dir
+    while (pos != Position.INVALID) {
+        add(pos)
+        pos += dir
+    }
+}
+
+/**
+ * @return Pair<Boolean> = is Move Valid ; List<Position> The turning pieces for the specified direction.
+*/
+// Neste caso é útil retornar tambem a linha para evitar repetir codigo
+private fun Board.isValidMove(move: Position, turn:PlayerColor, dir: Direction): Pair<Boolean, List<Position>> {
+    val line = cellsInDirection(move, dir)
+        .takeWhile { this[it] == turn.opponent && inLine2(move, it, dir) }
+
+    return Pair(line.isNotEmpty() && this[line.last() + dir] == turn, line)
+}
+
+fun Game.validMoves(turn: PlayerColor): Set<Position> =
+    Position.values.filter { p ->
+        board[p] == null && Direction.entries.any { dir -> board.isValidMove(p, turn, dir).first }
+    }.toSet()
 
 fun Game.turnMoves(turn: PlayerColor, move: Position): List<Pair<Position, PlayerColor>> =
-    directions.map{
-        this.turnMovesByDirection(turn, move, it)
-    }.flatten().distinct()
-
-private fun Game.turnMovesByDirection(turn: PlayerColor, move: Position, direction: Int = 0): List<Pair<Position, PlayerColor>> {
-    val opponent = turn.otherColor
-
-    val idx = move.index + direction
-    val range = if (direction < 0) (idx downTo 0 step -direction)
-                 else (idx until BOARD_CELLS step direction)
-
-    buildList {
-        for (i in range) {
-            if (!inLine(idx, Position(i).index, direction)) break
-
-            when (board[Position(i)]) {
-                opponent -> add(i)
-                turn -> {
-                    return this.map { Position(it) to turn }
-                }
-                else -> break
-            }
+    buildSet {
+        Direction.entries.forEach { dir ->
+            val isValidMove = board.isValidMove(move, turn, dir)
+            if (isValidMove.first)
+                add(isValidMove.second)
         }
-    }
-    return emptyList() // Returns emptyList if it couldn't find a player's piece on the same line/column/diagonal has the move.
-}
+    }.flatten().map { it to turn }
 
-private fun inLine(idx1: Int, idx2: Int, direction: Int): Boolean {
-    val row1 = Position(idx1).row
-    val col1 = Position(idx1).column
-    val row2 = Position(idx2).row
-    val col2 = Position(idx2).column
+private fun inLine2(pos1: Position, pos2: Position, direction: Direction): Boolean {
+    val row1 = pos1.row
+    val col1 = pos1.column
+    val row2 = pos2.row
+    val col2 = pos2.column
 
     return when (direction) {
-        1, -1 -> row1 == row2 // horizontal
-        BOARD_SIZE, -BOARD_SIZE -> col1 == col2 // vertical
-        BOARD_SIZE + 1 -> (row2 - row1) == (col2 - col1) // diagonal ↘
-        -BOARD_SIZE - 1 -> (row1 - row2) == (col1 - col2) // diagonal ↖
-        BOARD_SIZE - 1 -> (row2 - row1) == (col1 - col2) // diagonal ↙
-        -BOARD_SIZE + 1 -> (row1 - row2) == (col2 - col1) // diagonal ↗
-        else -> false
+        Direction.LEFT, Direction.RIGHT -> row1 == row2
+        Direction.UP, Direction.DOWN  -> col1 == col2
+        Direction.DOWN_RIGHT -> (row2 - row1) == (col2 - col1)
+        Direction.UP_LEFT -> (row1 - row2) == (col1 - col2)
+        Direction.DOWN_LEFT -> (row2 - row1) == (col1 - col2)
+        Direction.UP_RIGHT -> (row1 - row2) == (col2 - col1)
     }
 }

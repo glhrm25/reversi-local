@@ -11,9 +11,12 @@ class Position private constructor(val index: Int) {
 
     companion object {
         val values = List(BOARD_CELLS) { Position(it) }
-
+        val INVALID = Position(-1)
         // Invoke -> Position()
-        operator fun invoke(idx: Int): Position = values[idx]
+        private fun isValidPosition(index: Int) : Position =
+            values.firstOrNull { index == it.index } ?: INVALID
+
+        operator fun invoke(idx: Int): Position = isValidPosition(idx)
     }
 
     override fun toString() = "$row:$column"
@@ -22,3 +25,5 @@ class Position private constructor(val index: Int) {
 fun toBoardIndex(row: Int, column: Char): Int = (row-1) * BOARD_SIZE + column.toIntColumn()
 
 private fun Char.toIntColumn(): Int = this - 'A'
+
+operator fun Position.plus(dir: Direction) = Position((row-1+dir.difRow)*BOARD_SIZE + column.toIntColumn()+dir.difCol)

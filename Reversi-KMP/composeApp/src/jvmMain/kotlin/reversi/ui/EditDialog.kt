@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import reversi.model.Name
 import reversi.model.PlayerColor
-import reversi.model.otherColor
+import reversi.model.opponent
 
 @Composable
 fun EditDialog(mode: EditMode, onCancel: ()->Unit, onAction: (String, PlayerColor, Boolean)->Unit) {
@@ -37,7 +37,7 @@ fun EditDialog(mode: EditMode, onCancel: ()->Unit, onAction: (String, PlayerColo
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text("Player: ", style = MaterialTheme.typography.bodyLarge)
                         Spacer(Modifier.width(10.dp))
-                        animatedPiece(side, modifier = Modifier.size(CELL_SIDE/2).clickable{ side = side.otherColor })
+                        animatedPiece(side, modifier = Modifier.size(CELL_SIDE/2).clickable{ side = side.opponent })
                     }
                 }
                 // Fill game's name

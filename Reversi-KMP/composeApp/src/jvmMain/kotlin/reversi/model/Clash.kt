@@ -33,7 +33,7 @@ open class Clash (val gs: GameStorage) {
     fun join(name: Name): Clash {
         val g = gs.read(name)
         checkNotNull(g){"Game $name does not exist"}
-        return ClashRunMP(gs, name, Player(g.owner.otherColor), g)
+        return ClashRunMP(gs, name, Player(g.owner.opponent), g)
     }
     open fun finish(){ }
 }
@@ -103,7 +103,7 @@ class ClashRunLocal(
 fun ClashRun.newAvailable() =
     side.playerColor == when(val state = game.state) {
         is Run -> state.turn
-        else -> game.owner.otherColor
+        else -> game.owner.opponent
     }
 
 fun Clash.deleteIfOwner() {

@@ -13,12 +13,8 @@ import org.jetbrains.compose.resources.painterResource
 /**
  * TO-DO:
  * - CHANGE LISTS TO SETS
- * - REPETITIVE CODE:
- *      - FIX TARGETS FUNCTION REPETITIVE CODE
- *      - FIX REFRESH <-> AUTO-REFRESH FUNCTION REPETITIVE CODE
- * - BUGS:
- *      - FIX BUG ON SHOWTARGETS (VALID MOVES)
- *      - FIX BUG ON PIECE COUNTING (STATUS BAR)
+ * - FUNCTION IN MOVES.KT COULD BE EXTENSIONS OF BOARD INSTEAD OF GAME
+ *      - ALSO, MOVE THEM TO ANOTHER FILE AND DELETE MOVES.KT
  */
 @Composable
 fun FrameWindowScope.App(onExit: MutableState<()->Unit>) {

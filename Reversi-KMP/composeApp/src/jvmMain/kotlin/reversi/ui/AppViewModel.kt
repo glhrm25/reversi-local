@@ -81,7 +81,7 @@ class AppViewModel(val scope: CoroutineScope) {
     var animations by mutableStateOf<Set<Position>>(emptySet())
 
     val whitePiecesCounter get () = game.board.count { (_, col) -> col == PlayerColor.WHITE }
-    val blackPiecesCounter get () = game.board.count { (_, col) -> col == PlayerColor.WHITE }
+    val blackPiecesCounter get () = game.board.count { (_, col) -> col == PlayerColor.BLACK }
 
     /**
      * Performs an operation on the clash, catching exceptions to set the message property

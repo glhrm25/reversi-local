@@ -34,7 +34,7 @@ fun Grid(
         modifier.height(GRID_SIDE).background(Color.Black),
         verticalArrangement = Arrangement.spacedBy(LINE_THICKNESS)
     ) {
-        val validMoves = game.validMoves((game.state as Run).turn)
+        val validMoves = if (game.state is Run) game.validMoves(game.state.turn) else emptySet()
         repeat(BOARD_SIZE) { row ->
             Row(
                 modifier.width(GRID_SIDE).background(Color.Black),

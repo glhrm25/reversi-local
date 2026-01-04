@@ -8,7 +8,7 @@ typealias Board = Map<Position, PlayerColor>
 
 data class Game (
     val owner : PlayerColor = BLACK,
-    val board: Board = generateBoard(),
+    val board: Board = initialBoard(),
     val state: GameState = Run(owner),
 )
 
@@ -85,7 +85,7 @@ fun Game.pass(): Game =
         if (state is RunPassed)
             copy(state = getEndState(board))
         else
-            copy(state = RunPassed(state.turn.otherColor))
+            copy(state = RunPassed(state.turn.opponent))
     }
 
 /**
@@ -95,7 +95,7 @@ fun Game.pass(): Game =
  */
 private fun updateState(board: Board, state: Run): GameState =
     if (board.size != BOARD_CELLS)
-        Run(state.turn.otherColor)
+        Run(state.turn.opponent)
     else
         getEndState(board)
 
@@ -125,12 +125,13 @@ private fun getEndState(board: Board): GameState =
 /**
  * @return Starting board with its middle cells already occupied with the players pieces.
   */
-fun generateBoard(): Board {
+fun initialBoard(): Board {
     val middleColumn = BOARD_SIZE / 2
 
-   return emptyMap<Position, PlayerColor>() +
-           (Position(toBoardIndex(middleColumn, COLUMNS[middleColumn])) to BLACK) +
-           (Position(toBoardIndex(middleColumn + 1, COLUMNS[middleColumn - 1])) to BLACK) +
-           (Position(toBoardIndex(middleColumn + 1, COLUMNS[middleColumn])) to WHITE) +
-           (Position(toBoardIndex(middleColumn, COLUMNS[middleColumn - 1])) to WHITE)
+   return mapOf(
+           Position(toBoardIndex(middleColumn, COLUMNS[middleColumn])) to BLACK,
+           Position(toBoardIndex(middleColumn + 1, COLUMNS[middleColumn - 1])) to BLACK,
+           Position(toBoardIndex(middleColumn + 1, COLUMNS[middleColumn])) to WHITE,
+           Position(toBoardIndex(middleColumn, COLUMNS[middleColumn - 1])) to WHITE,
+   )
 }
