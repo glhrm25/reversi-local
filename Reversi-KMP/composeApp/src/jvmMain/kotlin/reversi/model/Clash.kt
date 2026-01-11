@@ -4,7 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import storage.Storage
 
-const val READ_DELAY = 5000L
+const val READ_DELAY = 2500L
 
 typealias GameStorage = Storage<Name, Game>
 
@@ -67,9 +67,7 @@ class ClashRunMP(
         )
 
     override suspend fun autoRefresh() =
-        copy( game = gs.slowRead(name)?.also { check( it != game) { "No changes" } }
-            ?: throw GameNotFoundException()
-        )
+        copy( game = gs.slowRead(name) ?: throw GameNotFoundException() )
 
     override fun targets(t: Boolean) =
         this.copy(side = side.copy(toggleTargets = t))

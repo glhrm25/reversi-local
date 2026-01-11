@@ -4,6 +4,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.*
@@ -16,7 +18,7 @@ import reversi.model.Name
 import reversi.model.PlayerColor
 import reversi.model.opponent
 
-val SPACE_BETWEEN_ELEMENTS = 4.dp
+val SPACE_BETWEEN_ELEMENTS = 6.dp
 
 @Composable
 fun EditDialog(mode: EditMode, onCancel: ()->Unit, onAction: (String, PlayerColor, Boolean)->Unit) {
@@ -48,18 +50,21 @@ fun EditDialog(mode: EditMode, onCancel: ()->Unit, onAction: (String, PlayerColo
                     }
                 }
                 // Fill game's name
-                if (isMultiplayer) {
-                    TextField(
-                        value = name,
-                        label = { Text("clash name") },
-                        onValueChange = { name = it },
-                        placeholder = { Text("Enter a name") },
-                        singleLine = true
-                    )
-                }
+                TextField(
+                    enabled = isMultiplayer,
+                    value = name,
+                    label = { Text("clash name") },
+                    onValueChange = { name = it },
+                    placeholder = { Text("Enter a name") },
+                    singleLine = true
+                )
+
+                Spacer(modifier = Modifier.height(SPACE_BETWEEN_ELEMENTS*2))
+                Button(onClick = { onAction(name, side, isMultiplayer) },
+                    colors = ButtonDefaults.buttonColors(Color.Blue),
+                    enabled = !isMultiplayer || Name.isValid(name) ) { Text(mode.text) }
             }
         },
-        dismissButton = { Button(onClick = onCancel) { Text("Cancel") } },
-        confirmButton = {  Button(onClick = { onAction(name, side, isMultiplayer) }, enabled = !isMultiplayer || Name.isValid(name)) { Text(mode.text) } }
+        confirmButton = {}
     )
 }

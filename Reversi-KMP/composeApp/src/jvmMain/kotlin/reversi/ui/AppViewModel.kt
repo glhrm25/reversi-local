@@ -51,7 +51,7 @@ class AppViewModel(val scope: CoroutineScope) {
         cancelWaiting()
         val nm = if(!isMultiplayer) null else Name(name)
         oper {
-            if (editMode == EditMode.START) new(nm, side)
+            if (editMode == EditMode.START) new(nm, side).also{ finish() }
             else nm?.let { join(nm) } ?: this
         }
         editMode = null
@@ -132,6 +132,7 @@ class AppViewModel(val scope: CoroutineScope) {
                 try {
                     clash = clash.autoRefresh()
                 } catch (ex: Exception) {
+                    println(ex)
                     if (ex is IllegalStateException) {
                         message = ex.message
                         if (ex is GameNotFoundException) {

@@ -9,6 +9,15 @@ import androidx.compose.ui.window.*
 import reversi_kmp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
 
+val TOTAL_WIDTH = STATUS_WIDTH
+val TOTAL_HEIGHT = (WIDTH + LINE_THICKNESS + STATUS_HEIGHT)*2 + GRID_SIDE
+
+/**
+ * TODO:
+ * BUGS:
+ * -
+ */
+
 @Composable
 fun FrameWindowScope.App(onExit: MutableState<()->Unit>) {
     val scope = rememberCoroutineScope()
@@ -21,7 +30,7 @@ fun FrameWindowScope.App(onExit: MutableState<()->Unit>) {
         Menu("Game") {
             Item("New", onClick = vm::new)
             Item("Join", onClick = vm::join)
-            Item("Refresh", onClick = vm::refresh, enabled = vm.isMP && !vm.isYourTurn)
+            Item("Refresh", onClick = vm::refresh, enabled = vm.isMP && !vm.isYourTurn && !vm.autoRefreshSetting)
             Item("Exit", onClick = { onExit.value() })
         }
         Menu("Play") {
@@ -35,19 +44,16 @@ fun FrameWindowScope.App(onExit: MutableState<()->Unit>) {
 
     MaterialTheme {
         if (vm.isRun) Column {
-            labeledGrid(vm.game, vm.animations, targetsAssistance = vm.you.toggleTargets, onClick = vm::play)
+            labeledGrid(vm.game, vm.animations, targetsAssistance = vm.you.toggleTargets && vm.isYourTurn, onClick = vm::play)
             StatusBar(vm.game.state, vm.you.playerColor, vm.isMP, vm.blackPiecesCounter, vm.whitePiecesCounter)
         }
         else
             Box(Modifier.width(GRID_SIDE).height(GRID_SIDE+STATUS_HEIGHT))
         vm.editMode?.let{ EditDialog(it, vm::cancelEdit, vm::doAction ) }
         vm.message?.let{ MessageInfo(it, vm::clearMessage) }
-        if (vm.isWaiting) WaitingIndicator()
+        //if (vm.isWaiting) WaitingIndicator()
     }
 }
-
-val TOTAL_WIDTH = STATUS_WIDTH
-val TOTAL_HEIGHT = (WIDTH + LINE_THICKNESS + STATUS_HEIGHT)*2 + GRID_SIDE
 
 fun main() = application {
     val onExit = remember { mutableStateOf<()->Unit>(::exitApplication) }
