@@ -2,6 +2,7 @@ package storage
 
 import com.mongodb.MongoWriteException
 import reversi.model.GameNotFoundException
+import reversi.model.GameAlreadyExistsException
 import storage.mongo.*
 import kotlin.let
 import kotlin.toString
@@ -22,7 +23,8 @@ class MongoStorage<Key, Data>(
     override fun create(k: Key, data: Data) {
         try{ docs.insertDocument(Doc(k, data)) }
         catch (_: MongoWriteException){
-            error("Game $k already exists")
+            //error("Game $k already exists")
+            throw GameAlreadyExistsException()
         }   }
     override fun read(k: Key): Data? =
         docs.getDocument(k.toString())

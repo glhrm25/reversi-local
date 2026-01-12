@@ -33,8 +33,8 @@ open class Clash (val gs: GameStorage) {
     }
 
     fun join(name: Name): Clash {
-        val g = gs.read(name)
-        checkNotNull(g){"Game $name does not exist"}
+        val g = gs.read(name) ?: throw GameNotFoundException()
+        //checkNotNull(g){"Game $name does not exist"}
         return ClashRunMP(gs, name, Player(g.owner.opponent), g)
     }
     open fun finish(){ }
@@ -111,6 +111,7 @@ fun ClashRun.deleteIfOwner() {
 }
 
 class GameNotFoundException: IllegalStateException("Game not found")
+class GameAlreadyExistsException: IllegalStateException("Game already exists")
 
 private suspend fun GameStorage.slowRead(name: Name): Game?{
     return withContext(Dispatchers.IO) { // Dispacthers.IO -> Arranja uma cortina noutra thread

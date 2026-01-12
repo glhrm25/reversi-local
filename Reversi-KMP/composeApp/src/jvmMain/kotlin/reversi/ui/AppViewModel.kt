@@ -28,8 +28,11 @@ class AppViewModel(val scope: CoroutineScope) {
 
     fun play(pos: Position) {
         if (game.state is Run && !isWaiting){
-            animations = game.turningPieces((game.state as Run).turn, pos).map{ (p, _) -> p}.toSet()
-            oper { play(pos) }
+            oper {
+                play(pos).also{
+                    animations = game.turningPieces((game.state as Run).turn, pos).map{ (p, _) -> p}.toSet()
+                }
+            }
             waitForOther()
         }
     }
@@ -96,10 +99,17 @@ class AppViewModel(val scope: CoroutineScope) {
             clash = clash.op()
         } catch (ex: Exception) {
             println(ex)
-            if (ex is IllegalStateException || ex is IllegalArgumentException) {
+            /*if (ex is IllegalStateException || ex is IllegalArgumentException) {
                 message = ex.message
                 if (ex is GameNotFoundException)
                     clash = Clash(storage)
+            }*/
+            if (ex is IllegalStateException || ex is IllegalArgumentException) {
+                //message = ex.message
+                if (ex is GameNotFoundException || ex is GameAlreadyExistsException) {
+                    message = ex.message
+                    clash = Clash(storage)
+                }
             }
             else throw ex
         }
