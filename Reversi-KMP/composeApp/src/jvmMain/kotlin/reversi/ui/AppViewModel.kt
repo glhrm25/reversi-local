@@ -24,7 +24,7 @@ class AppViewModel(val scope: CoroutineScope) {
         private set
     val isRun get() = clash is ClashRunMP || clash is ClashRunLocal
     val isMP get() = clash is ClashRunMP
-    val isYourTurn get() = isRun && (game.state is Run) && ((game.state as Run).turn == you.playerColor)
+    val isYourTurn get() = isRun && (game.state is Run) && (!isMP || ((game.state as Run).turn == you.playerColor))
 
     fun play(pos: Position) {
         if (game.state is Run && !isWaiting){
@@ -45,6 +45,7 @@ class AppViewModel(val scope: CoroutineScope) {
     }
 
     val targetsAssistanceSetting get() = if (isRun) you.toggleTargets else false
+    val showTargets get() = targetsAssistanceSetting && (isYourTurn || !isMP)
     fun targets(value: Boolean) = oper { targets(value) }
 
     /**
@@ -75,7 +76,7 @@ class AppViewModel(val scope: CoroutineScope) {
         clash.finish()
     }
 
-    fun closeGame() = finish().also{ clash = Clash(storage) }
+    fun leaveGame() = finish().also{ clash = Clash(storage) }
     /**
      * Properties to access ClashRun info
      */
@@ -83,6 +84,7 @@ class AppViewModel(val scope: CoroutineScope) {
     val you get() = (clash as ClashRun).side
     val name get() = (clash as ClashRunMP).name
     val newAvailable get() = (clash as? ClashRun)?.newAvailable() ?: false
+    val canPass get() = isYourTurn && game.validMoves((game.state as Run).turn).isEmpty()
 
     /**
     * Set that contains the flipping pieces after a move to display the animation
@@ -136,7 +138,7 @@ class AppViewModel(val scope: CoroutineScope) {
         job = null
     }
     private fun waitForOther() {
-        if (clash !is ClashRun || newAvailable || !autoRefreshSetting) return
+        if (clash !is ClashRunMP || newAvailable || !autoRefreshSetting) return
         job = scope.launch {
             do {
                 delay(3000)
@@ -145,7 +147,7 @@ class AppViewModel(val scope: CoroutineScope) {
                 } catch (ex: Exception) {
                     println(ex)
                     if (ex is IllegalStateException) {
-                        message = ex.message
+                        //message = ex.message
                         if (ex is GameNotFoundException) {
                             clash = Clash(storage)
                             break
