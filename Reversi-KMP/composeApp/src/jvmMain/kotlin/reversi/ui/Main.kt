@@ -14,8 +14,7 @@ val TOTAL_HEIGHT = (WIDTH + LINE_THICKNESS + STATUS_HEIGHT)*2 + GRID_SIDE
 
 /**
  * TODO:
- * BUGS:
- * - Animações do outro player
+ *
  */
 
 @Composable
