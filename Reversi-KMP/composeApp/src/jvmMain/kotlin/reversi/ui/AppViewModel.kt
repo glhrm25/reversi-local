@@ -75,6 +75,7 @@ class AppViewModel(val scope: CoroutineScope) {
         clash.finish()
     }
 
+    fun closeGame() = finish().also{ clash = Clash(storage) }
     /**
      * Properties to access ClashRun info
      */

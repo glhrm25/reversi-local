@@ -3,7 +3,9 @@ package reversi.ui
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.*
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.window.*
 import reversi_kmp.composeapp.generated.resources.*
@@ -31,6 +33,7 @@ fun FrameWindowScope.App(onExit: MutableState<()->Unit>) {
             Item("New", onClick = vm::new)
             Item("Join", onClick = vm::join)
             Item("Refresh", onClick = vm::refresh, enabled = vm.isMP && !vm.isYourTurn && !vm.autoRefreshSetting)
+            Item("Leave Game", onClick = vm::closeGame, enabled = vm.isRun)
             Item("Exit", onClick = { onExit.value() })
         }
         Menu("Play") {
@@ -51,7 +54,7 @@ fun FrameWindowScope.App(onExit: MutableState<()->Unit>) {
             Box(Modifier.width(GRID_SIDE).height(GRID_SIDE+STATUS_HEIGHT))
         vm.editMode?.let{ EditDialog(it, vm::cancelEdit, vm::doAction ) }
         vm.message?.let{ MessageInfo(it, vm::clearMessage) }
-        //if (vm.isWaiting) WaitingIndicator()
+        //if (vm.isWaiting) WaitingIndicator() // Auto-Refresh indicator
     }
 }
 
