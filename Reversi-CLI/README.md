@@ -1,13 +1,3 @@
-# 33d-2526i-grupo07
-
-52559 - Isadora Mendes 
-
-52599 - Duarte Rodrigues
-
-52673 - Guilherme Santos
-
-_______________________________________________________________
-
 # Reversi Game
 This project implements a simple version of the Reversi (Othello) game in Kotlin, playable through a command-line interface.
 The game supports:
